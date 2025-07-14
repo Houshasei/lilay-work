@@ -89,10 +89,10 @@
 </head>
 <body>
    <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">
-    <button onclick="prevProfile()">⬅️ Prev</button>
-    <button onclick="nextProfile()">Next ➡️</button>
-    <button onclick="goToFirstProfile()">🔁 First </button>
-    <button onclick="preloadSheets()">🔄 Refresh</button>
+    <button onclick="prevProfile(); isLocated(false)">⬅️ Prev</button>
+    <button onclick="nextProfile(); isLocated(false)">Next ➡️</button>
+    <button onclick="goToFirstProfile(); isLocated(false)">🔁 First </button>
+    <button onclick="preloadSheets(); isLocated(false)">🔄 Refresh</button>
   </div>
   <div style="background:white; border-radius:16px; box-shadow:0 2px 6px rgba(0,0,0,0.08); padding:16px; margin-bottom:16px;">
     <h2 style="margin:0 0 8px;">👤 Current Profile</h2>
@@ -105,7 +105,7 @@
     <button onclick="showModal('postsModal')">📝 Show Posts</button>
     <button onclick="pickRandom('Caption'); openThreads()">🖊 Pick Caption</button>
     <button onclick="pickTodayPost(); openThreads()">📅 Pick Post</button>
-    <button onclick="pickRandom('Reply'); searchLocation()">💬 Pick Reply</button>
+    <button onclick="pickRandom('Reply'); searchLocation(); isLocated(true)">💬 Pick Reply</button>
     <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
     
   </div>
@@ -129,7 +129,7 @@
   <div id="toast"></div>
   <script>
     const sheetUrl = 'https://script.google.com/macros/s/AKfycbwtg9SSavHBy50Y6RNR2sOAsdjQhzG5kc5gpA5aIUUrFlEuy1y3XUSjb17KiY5fgKSKJA/exec';
-    let profiles = [], currentProfile = 0;
+    let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {};
 
 async function fetchSheet(sheetName) {
@@ -279,11 +279,18 @@ function searchLocation() {
       showToast("Location not found for this profile.");
       return;
     }
-
+    if (located) {
+      openThreads();
+    }
     const query = encodeURIComponent(location);
     const url = `https://www.threads.net/search?q=${query}`;
     window.open(url, '_blank');
   }
+
+  function isLocated(location) {
+    located = location;
+  }
+
     function openThreads() {
    window.open(`https://threads.com/`, "_blank");
 }
