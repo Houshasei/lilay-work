@@ -281,6 +281,7 @@ function searchLocation() {
     }
     if (located) {
       openThreads();
+      return;
     }
     const query = encodeURIComponent(location);
     const url = `https://www.threads.net/search?q=${query}`;
