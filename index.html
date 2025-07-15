@@ -284,9 +284,9 @@ function searchLocation() {
       return;
     }
     const query = encodeURIComponent(location);
-    const url = `https://www.threads.net/search?q=${query}`;
+    const url = `https://www.threads.com/search?q=${query}&serp_type=default&hl=en`;
     window.open(url, '_blank');
-  }
+}
 
   function isLocated(location) {
     located = location;
