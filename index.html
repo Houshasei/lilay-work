@@ -152,7 +152,7 @@
       });
 
       if (matchingThread) {
-        const shortcutUrl = `shortcuts://run-shortcut?name=${matchingThread}`;
+        const shortcutUrl = `shortcuts://run-shortcut?name=${matchingThread}&x-success=safari://`;
         window.location.href = shortcutUrl;
       } else {
         console.log('No matching ThreadContainer found for Container ID:', containerId);
