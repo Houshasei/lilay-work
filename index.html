@@ -88,7 +88,7 @@
   </style>
 </head>
 <body>
-  <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">
+   <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">
     <button onclick="prevProfile(); isLocated(false)">⬅️ Prev</button>
     <button onclick="nextProfile(); isLocated(false)">Next ➡️</button>
     <button onclick="goToFirstProfile(); isLocated(false)">🔁 First </button>
@@ -107,6 +107,7 @@
     <button onclick="pickTodayPost(); openThreads()">📅 Pick Post</button>
     <button onclick="pickRandom('Reply'); openThreads()">💬 Pick Reply</button>
     <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
+    
   </div>
 
   <div id="profileModal" class="modal">
@@ -131,188 +132,174 @@
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {};
 
-    async function fetchSheet(sheetName) {
-      if (sheetCache[sheetName]) return sheetCache[sheetName];
-      const res = await fetch(`${sheetUrl}?sheet=${sheetName}`);
-      if (!res.ok) throw new Error("Failed to fetch " + sheetName);
-      const data = await res.json();
-      sheetCache[sheetName] = data;
-      return data;
+async function fetchSheet(sheetName) {
+  if (sheetCache[sheetName]) return sheetCache[sheetName];
+  const res = await fetch(`${sheetUrl}?sheet=${sheetName}`);
+  if (!res.ok) throw new Error("Failed to fetch " + sheetName);
+  const data = await res.json();
+  sheetCache[sheetName] = data;
+  return data;
+}
+
+async function preloadSheets() {
+  try {
+    setButtonsDisabled(true); // Lock buttons
+    showToast("Refreshing data...");
+
+    sheetCache = {}; // clear old data
+    const savedIndex = parseInt(localStorage.getItem('lastProfileIndex')) || 0;
+
+    profiles = await fetchSheet('Accounts');
+    sheetCache['Accounts'] = profiles;
+    sheetCache['Posts'] = await fetchSheet('Posts');
+    sheetCache['Reply'] = await fetchSheet('Reply');
+    sheetCache['Comments'] = await fetchSheet('Comments');
+    sheetCache['Caption'] = await fetchSheet('Caption');
+
+    showToast("Sheets refreshed!");
+    displayProfile(savedIndex);
+  } catch (e) {
+    showToast("Refresh failed");
+  } finally {
+    setButtonsDisabled(false); // Unlock buttons
+  }
+}
+
+
+function displayProfile(index) {
+  if (profiles.length === 0) return;
+  currentProfile = (index + profiles.length) % profiles.length;
+  localStorage.setItem('lastProfileIndex', currentProfile); // Save to localStorage
+
+  const profile = profiles[currentProfile];
+  document.getElementById('username').textContent = profile.username;
+  document.getElementById('location').textContent = profile.location;
+  document.getElementById('container').textContent = profile.container;
+}
+function nextProfile() { displayProfile(currentProfile + 1); }
+function prevProfile() { displayProfile(currentProfile - 1); }
+function goToFirstProfile() { displayProfile(0); }
+
+function showModal(id) {
+  if (id === 'profileModal') loadAccounts();
+  if (id === 'postsModal') loadPosts();
+  document.getElementById(id).style.display = 'flex';
+}
+function hideModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+async function loadAccounts() {
+  try {
+    const accounts = await fetchSheet('Accounts');
+    const table = document.getElementById("profileTable");
+    table.innerHTML = '<tr><th>Username</th><th>Location</th><th>Container ID</th></tr>' +
+      accounts.map(p => `<tr><td>${p.username}</td><td>${p.location}</td><td>${p.container}</td></tr>`).join('');
+  } catch (e) {
+    showToast("Failed to load accounts");
+  }
+}
+
+async function loadPosts() {
+  try {
+    const posts = await fetchSheet('Posts');
+    const table = document.getElementById("postsTable");
+    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    table.innerHTML = '<tr>' + days.map(d => `<th>${d}</th>`).join('') + '</tr>' +
+      posts.map(row => `<tr>` + days.map(day => `<td>${row[day] || ''}</td>`).join('') + '</tr>').join('');
+  } catch (e) {
+    showToast("Failed to load posts");
+  }
+}
+
+function pickRandom(sheetName) {
+  showToast(`Copying from ${sheetName}...`);
+  fetchSheet(sheetName).then(data => {
+    const choice = data[Math.floor(Math.random() * data.length)];
+    let value = Object.values(choice)[0];
+
+    // Replace (loc) with the current profile's location
+    const loc = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || "";
+    value = value.replace(/\(loc\)/gi, loc);
+
+    navigator.clipboard.writeText(value);
+    showToast(`${sheetName} copied!`);
+  }).catch(() => showToast(`Failed to load ${sheetName}`));
+}
+
+
+function resetPickedPosts() {
+  pickedPostIndexes = {};
+  showToast("Post pool reset!");
+}
+
+async function pickTodayPost() {
+  try {
+    showToast("Picking today's post...");
+    const posts = await fetchSheet('Posts');
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const today = days[new Date().getDay()];
+
+    const todayPosts = posts
+      .map((row, index) => ({ index, text: row[today] }))
+      .filter(p => p.text?.trim());
+
+    if (!pickedPostIndexes[today]) pickedPostIndexes[today] = [];
+    const unused = todayPosts.filter(p => !pickedPostIndexes[today].includes(p.index));
+
+    if (unused.length === 0) {
+      pickedPostIndexes[today] = [];
+      showToast("All posts used, restarting pool");
+      return pickTodayPost();
     }
 
-    async function preloadSheets() {
-      try {
-        setButtonsDisabled(true); // Lock buttons
-        showToast("Refreshing data...");
+    const selected = unused[Math.floor(Math.random() * unused.length)];
+    pickedPostIndexes[today].push(selected.index);
 
-        sheetCache = {}; // clear old data
-        const savedIndex = parseInt(localStorage.getItem('lastProfileIndex')) || 0;
+    const location = profiles[currentProfile]?.location || profiles[currentProfile]?.Location || "";
+    const finalText = selected.text.replace(/\(loc\)/gi, location);
 
-        profiles = await fetchSheet('Accounts');
-        sheetCache['Accounts'] = profiles;
-        sheetCache['Posts'] = await fetchSheet('Posts');
-        sheetCache['Reply'] = await fetchSheet('Reply');
-        sheetCache['Comments'] = await fetchSheet('Comments');
-        sheetCache['Caption'] = await fetchSheet('Caption');
+    await navigator.clipboard.writeText(finalText);
+    showToast("Post copied with location!");
+  } catch (e) {
+    showToast("Error picking post");
+  }
+}
 
-        showToast("Sheets refreshed!");
-        displayProfile(savedIndex);
-      } catch (e) {
-        showToast("Refresh failed");
-      } finally {
-        setButtonsDisabled(false); // Unlock buttons
-      }
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "show";
+  setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+}
+
+function searchLocation() {
+    const location = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || '';
+    if (!location) {
+      showToast("Location not found for this profile.");
+      return;
     }
-
-    function displayProfile(index) {
-      if (profiles.length === 0) return;
-      currentProfile = (index + profiles.length) % profiles.length;
-      localStorage.setItem('lastProfileIndex', currentProfile); // Save to localStorage
-
-      const profile = profiles[currentProfile];
-      document.getElementById('username').textContent = profile.username;
-      document.getElementById('location').textContent = profile.location;
-      document.getElementById('container').textContent = profile.container;
+    if (located) {
+      openThreads();
+      return;
     }
+    const query = encodeURIComponent(location);
+    const url = `https://www.threads.com/search?q=${query}&serp_type=default&hl=en`;
+    window.open(url, '_blank');
+}
 
-    function nextProfile() { displayProfile(currentProfile + 1); }
-    function prevProfile() { displayProfile(currentProfile - 1); }
-    function goToFirstProfile() { displayProfile(0); }
-
-    function showModal(id) {
-      if (id === 'profileModal') loadAccounts();
-      if (id === 'postsModal') loadPosts();
-      document.getElementById(id).style.display = 'flex';
-    }
-
-    function hideModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    async function loadAccounts() {
-      try {
-        const accounts = await fetchSheet('Accounts');
-        const table = document.getElementById("profileTable");
-        table.innerHTML = '<tr><th>Username</th><th>Location</th><th>Container ID</th></tr>' +
-          accounts.map(p => `<tr><td>${p.username}</td><td>${p.location}</td><td>${p.container}</td></tr>`).join('');
-      } catch (e) {
-        showToast("Failed to load accounts");
-      }
-    }
-
-    async function loadPosts() {
-      try {
-        const posts = await fetchSheet('Posts');
-        const table = document.getElementById("postsTable");
-        const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-        table.innerHTML = '<tr>' + days.map(d => `<th>${d}</th>`).join('') + '</tr>' +
-          posts.map(row => `<tr>` + days.map(day => `<td>${row[day] || ''}</td>`).join('') + '</tr>').join('');
-      } catch (e) {
-        showToast("Failed to load posts");
-      }
-    }
-
-    function pickRandom(sheetName) {
-      showToast(`Copying from ${sheetName}...`);
-      fetchSheet(sheetName).then(data => {
-        const choice = data[Math.floor(Math.random() * data.length)];
-        let value = Object.values(choice)[0];
-
-        // Replace (loc) with the current profile's location
-        const loc = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || "";
-        value = value.replace(/\(loc\)/gi, loc);
-
-        navigator.clipboard.writeText(value);
-        showToast(`${sheetName} copied!`);
-      }).catch(() => showToast(`Failed to load ${sheetName}`));
-    }
-
-    function resetPickedPosts() {
-      pickedPostIndexes = {};
-      showToast("Post pool reset!");
-    }
-
-    async function pickTodayPost() {
-      try {
-        showToast("Picking today's post...");
-        const posts = await fetchSheet('Posts');
-        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        const today = days[new Date().getDay()];
-
-        const todayPosts = posts
-          .map((row, index) => ({ index, text: row[today] }))
-          .filter(p => p.text?.trim());
-
-        if (!pickedPostIndexes[today]) pickedPostIndexes[today] = [];
-        const unused = todayPosts.filter(p => !pickedPostIndexes[today].includes(p.index));
-
-        if (unused.length === 0) {
-          pickedPostIndexes[today] = [];
-          showToast("All posts used, restarting pool");
-          return pickTodayPost();
-        }
-
-        const selected = unused[Math.floor(Math.random() * unused.length)];
-        pickedPostIndexes[today].push(selected.index);
-
-        const location = profiles[currentProfile]?.location || profiles[currentProfile]?.Location || "";
-        const finalText = selected.text.replace(/\(loc\)/gi, location);
-
-        await navigator.clipboard.writeText(finalText);
-        showToast("Post copied with location!");
-      } catch (e) {
-        showToast("Error picking post");
-      }
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.className = "show";
-      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
-    }
-
-    function searchLocation() {
-      const location = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || '';
-      if (!location) {
-        showToast("Location not found for this profile.");
-        return;
-      }
-      if (located) {
-        openThreads();
-        return;
-      }
-      const query = encodeURIComponent(location);
-      const url = `https://www.threads.com/search?q=${query}&serp_type=default&hl=en`;
-      window.open(url, '_blank');
-    }
-
-    function isLocated(location) {
-      located = location;
-    }
+  function isLocated(location) {
+    located = location;
+  }
 
     function openThreads() {
-      const containerId = document.getElementById('container').textContent;
-      if (containerId === '-' || !containerId) {
-        showToast('No valid Container ID selected!');
-        return;
-      }
-
-      try {
-        // Trigger the Shortcut with the Container ID as input
-        const url = `shortcuts://run-shortcut?name=LaunchThreadsContainer&input=${encodeURIComponent(containerId)}`;
-        window.location.href = url;
-      } catch (error) {
-        showToast('Error launching Threads: Ensure the "LaunchThreadsContainer" Shortcut is set up with Crane\'s "Switch to Crane Container" action.');
-      }
-    }
-
+   window.open(`https://threads.com/`, "_blank");
+}
     function setButtonsDisabled(disabled) {
-      const buttons = document.querySelectorAll('#buttonContainer button');
-      buttons.forEach(btn => btn.disabled = disabled);
-    }
-
-    window.onload = preloadSheets;
+  const buttons = document.querySelectorAll('#buttonContainer button');
+  buttons.forEach(btn => btn.disabled = disabled);
+}
+window.onload = preloadSheets;// JavaScript will be attached separately to keep HTML clean.
   </script>
 </body>
 </html>
