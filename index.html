@@ -107,7 +107,6 @@
     <button onclick="pickTodayPost(); openThreads()">📅 Pick Post</button>
     <button onclick="pickRandom('Reply'); openThreads()">💬 Pick Reply</button>
     <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
-    
   </div>
 
   <div id="profileModal" class="modal">
@@ -132,174 +131,207 @@
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {};
 
-async function fetchSheet(sheetName) {
-  if (sheetCache[sheetName]) return sheetCache[sheetName];
-  const res = await fetch(`${sheetUrl}?sheet=${sheetName}`);
-  if (!res.ok) throw new Error("Failed to fetch " + sheetName);
-  const data = await res.json();
-  sheetCache[sheetName] = data;
-  return data;
-}
+    // List of ThreadContainers
+    const threadContainers = [
+      'Threads1', 'Threads2', 'Threads3', 'Threads4', 'Threads5', 'Threads9', 'Threads11', 'Threads12', 'Threads13', 
+      'Threads14', 'Threads15', 'Threads17', 'Threads18', 'Threads21', 'Threads23', 'Threads24', 'Threads27', 'Threads31', 
+      'Threads33', 'Threads35', 'Threads36', 'Threads37', 'Threads38', 'Threads39', 'Threads40', 'Threads41', 'Threads42', 
+      'Threads43', 'Threads44', 'Threads45', 'Threads46', 'Threads47', 'Threads49', 'Threads50', 'Threads51', 'Threads52', 
+      'Threads53', 'Threads54', 'Threads55', 'Threads56', 'Threads57', 'Threads60', 'Threads61', 'Threads62', 'Threads63', 
+      'Threads64', 'Threads65', 'Threads66', 'Threads67', 'Threads68', 'Threads69', 'Threads70', 'Threads71', 'Threads72', 
+      'Threads73', 'Threads74', 'Threads75', 'Threads76', 'Threads77', 'Threads78', 'Threads79', 'Threads80'
+    ];
 
-async function preloadSheets() {
-  try {
-    setButtonsDisabled(true); // Lock buttons
-    showToast("Refreshing data...");
+    // Function to run the matching Shortcut based on Container ID number
+    function runContainerShortcut() {
+      const containerId = document.getElementById('container').innerText.trim();
+      const containerNumber = parseInt(containerId, 10);
+      const matchingThread = threadContainers.find(thread => {
+        const threadNumber = parseInt(thread.replace('Threads', ''), 10);
+        return threadNumber === containerNumber;
+      });
 
-    sheetCache = {}; // clear old data
-    const savedIndex = parseInt(localStorage.getItem('lastProfileIndex')) || 0;
-
-    profiles = await fetchSheet('Accounts');
-    sheetCache['Accounts'] = profiles;
-    sheetCache['Posts'] = await fetchSheet('Posts');
-    sheetCache['Reply'] = await fetchSheet('Reply');
-    sheetCache['Comments'] = await fetchSheet('Comments');
-    sheetCache['Caption'] = await fetchSheet('Caption');
-
-    showToast("Sheets refreshed!");
-    displayProfile(savedIndex);
-  } catch (e) {
-    showToast("Refresh failed");
-  } finally {
-    setButtonsDisabled(false); // Unlock buttons
-  }
-}
-
-
-function displayProfile(index) {
-  if (profiles.length === 0) return;
-  currentProfile = (index + profiles.length) % profiles.length;
-  localStorage.setItem('lastProfileIndex', currentProfile); // Save to localStorage
-
-  const profile = profiles[currentProfile];
-  document.getElementById('username').textContent = profile.username;
-  document.getElementById('location').textContent = profile.location;
-  document.getElementById('container').textContent = profile.container;
-}
-function nextProfile() { displayProfile(currentProfile + 1); }
-function prevProfile() { displayProfile(currentProfile - 1); }
-function goToFirstProfile() { displayProfile(0); }
-
-function showModal(id) {
-  if (id === 'profileModal') loadAccounts();
-  if (id === 'postsModal') loadPosts();
-  document.getElementById(id).style.display = 'flex';
-}
-function hideModal(id) {
-  document.getElementById(id).style.display = 'none';
-}
-
-async function loadAccounts() {
-  try {
-    const accounts = await fetchSheet('Accounts');
-    const table = document.getElementById("profileTable");
-    table.innerHTML = '<tr><th>Username</th><th>Location</th><th>Container ID</th></tr>' +
-      accounts.map(p => `<tr><td>${p.username}</td><td>${p.location}</td><td>${p.container}</td></tr>`).join('');
-  } catch (e) {
-    showToast("Failed to load accounts");
-  }
-}
-
-async function loadPosts() {
-  try {
-    const posts = await fetchSheet('Posts');
-    const table = document.getElementById("postsTable");
-    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    table.innerHTML = '<tr>' + days.map(d => `<th>${d}</th>`).join('') + '</tr>' +
-      posts.map(row => `<tr>` + days.map(day => `<td>${row[day] || ''}</td>`).join('') + '</tr>').join('');
-  } catch (e) {
-    showToast("Failed to load posts");
-  }
-}
-
-function pickRandom(sheetName) {
-  showToast(`Copying from ${sheetName}...`);
-  fetchSheet(sheetName).then(data => {
-    const choice = data[Math.floor(Math.random() * data.length)];
-    let value = Object.values(choice)[0];
-
-    // Replace (loc) with the current profile's location
-    const loc = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || "";
-    value = value.replace(/\(loc\)/gi, loc);
-
-    navigator.clipboard.writeText(value);
-    showToast(`${sheetName} copied!`);
-  }).catch(() => showToast(`Failed to load ${sheetName}`));
-}
-
-
-function resetPickedPosts() {
-  pickedPostIndexes = {};
-  showToast("Post pool reset!");
-}
-
-async function pickTodayPost() {
-  try {
-    showToast("Picking today's post...");
-    const posts = await fetchSheet('Posts');
-    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const today = days[new Date().getDay()];
-
-    const todayPosts = posts
-      .map((row, index) => ({ index, text: row[today] }))
-      .filter(p => p.text?.trim());
-
-    if (!pickedPostIndexes[today]) pickedPostIndexes[today] = [];
-    const unused = todayPosts.filter(p => !pickedPostIndexes[today].includes(p.index));
-
-    if (unused.length === 0) {
-      pickedPostIndexes[today] = [];
-      showToast("All posts used, restarting pool");
-      return pickTodayPost();
+      if (matchingThread) {
+        const shortcutUrl = `shortcuts://run-shortcut?name=${matchingThread}`;
+        window.location.href = shortcutUrl;
+      } else {
+        console.log('No matching ThreadContainer found for Container ID:', containerId);
+      }
     }
 
-    const selected = unused[Math.floor(Math.random() * unused.length)];
-    pickedPostIndexes[today].push(selected.index);
-
-    const location = profiles[currentProfile]?.location || profiles[currentProfile]?.Location || "";
-    const finalText = selected.text.replace(/\(loc\)/gi, location);
-
-    await navigator.clipboard.writeText(finalText);
-    showToast("Post copied with location!");
-  } catch (e) {
-    showToast("Error picking post");
-  }
-}
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textContent = message;
-  toast.className = "show";
-  setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
-}
-
-function searchLocation() {
-    const location = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || '';
-    if (!location) {
-      showToast("Location not found for this profile.");
-      return;
+    async function fetchSheet(sheetName) {
+      if (sheetCache[sheetName]) return sheetCache[sheetName];
+      const res = await fetch(`${sheetUrl}?sheet=${sheetName}`);
+      if (!res.ok) throw new Error("Failed to fetch " + sheetName);
+      const data = await res.json();
+      sheetCache[sheetName] = data;
+      return data;
     }
-    if (located) {
-      openThreads();
-      return;
-    }
-    const query = encodeURIComponent(location);
-    const url = `https://www.threads.com/search?q=${query}&serp_type=default&hl=en`;
-    window.open(url, '_blank');
-}
 
-  function isLocated(location) {
-    located = location;
-  }
+    async function preloadSheets() {
+      try {
+        setButtonsDisabled(true);
+        showToast("Refreshing data...");
+
+        sheetCache = {};
+        const savedIndex = parseInt(localStorage.getItem('lastProfileIndex')) || 0;
+
+        profiles = await fetchSheet('Accounts');
+        sheetCache['Accounts'] = profiles;
+        sheetCache['Posts'] = await fetchSheet('Posts');
+        sheetCache['Reply'] = await fetchSheet('Reply');
+        sheetCache['Comments'] = await fetchSheet('Comments');
+        sheetCache['Caption'] = await fetchSheet('Caption');
+
+        showToast("Sheets refreshed!");
+        displayProfile(savedIndex);
+        runContainerShortcut(); // Run Shortcut after data refresh
+      } catch (e) {
+        showToast("Refresh failed");
+      } finally {
+        setButtonsDisabled(false);
+      }
+    }
+
+    function displayProfile(index) {
+      if (profiles.length === 0) return;
+      currentProfile = (index + profiles.length) % profiles.length;
+      localStorage.setItem('lastProfileIndex', currentProfile);
+
+      const profile = profiles[currentProfile];
+      document.getElementById('username').textContent = profile.username;
+      document.getElementById('location').textContent = profile.location;
+      document.getElementById('container').textContent = profile.container;
+      runContainerShortcut(); // Run Shortcut after profile display
+    }
+
+    function nextProfile() { displayProfile(currentProfile + 1); }
+    function prevProfile() { displayProfile(currentProfile - 1); }
+    function goToFirstProfile() { displayProfile(0); }
+
+    function showModal(id) {
+      if (id === 'profileModal') loadAccounts();
+      if (id === 'postsModal') loadPosts();
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function hideModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    async function loadAccounts() {
+      try {
+        const accounts = await fetchSheet('Accounts');
+        const table = document.getElementById("profileTable");
+        table.innerHTML = '<tr><th>Username</th><th>Location</th><th>Container ID</th></tr>' +
+          accounts.map(p => `<tr><td>${p.username}</td><td>${p.location}</td><td>${p.container}</td></tr>`).join('');
+      } catch (e) {
+        showToast("Failed to load accounts");
+      }
+    }
+
+    async function loadPosts() {
+      try {
+        const posts = await fetchSheet('Posts');
+        const table = document.getElementById("postsTable");
+        const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        table.innerHTML = '<tr>' + days.map(d => `<th>${d}</th>`).join('') + '</tr>' +
+          posts.map(row => `<tr>` + days.map(day => `<td>${row[day] || ''}</td>`).join('') + '</tr>').join('');
+      } catch (e) {
+        showToast("Failed to load posts");
+      }
+    }
+
+    function pickRandom(sheetName) {
+      showToast(`Copying from ${sheetName}...`);
+      fetchSheet(sheetName).then(data => {
+        const choice = data[Math.floor(Math.random() * data.length)];
+        let value = Object.values(choice)[0];
+
+        const loc = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || "";
+        value = value.replace(/\(loc\)/gi, loc);
+
+        navigator.clipboard.writeText(value);
+        showToast(`${sheetName} copied!`);
+      }).catch(() => showToast(`Failed to load ${sheetName}`));
+    }
+
+    async function pickTodayPost() {
+      try {
+        showToast("Picking today's post...");
+        const posts = await fetchSheet('Posts');
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const today = days[new Date().getDay()];
+
+        const todayPosts = posts
+          .map((row, index) => ({ index, text: row[today] }))
+          .filter(p => p.text?.trim());
+
+        if (!pickedPostIndexes[today]) pickedPostIndexes[today] = [];
+        const unused = todayPosts.filter(p => !pickedPostIndexes[today].includes(p.index));
+
+        if (unused.length === 0) {
+          pickedPostIndexes[today] = [];
+          showToast("All posts used, restarting pool");
+          return pickTodayPost();
+        }
+
+        const selected = unused[Math.floor(Math.random() * unused.length)];
+        pickedPostIndexes[today].push(selected.index);
+
+        const location = profiles[currentProfile]?.location || profiles[currentProfile]?.Location || "";
+        const finalText = selected.text.replace(/\(loc\)/gi, location);
+
+        await navigator.clipboard.writeText(finalText);
+        showToast("Post copied with location!");
+      } catch (e) {
+        showToast("Error picking post");
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+    }
+
+    function searchLocation() {
+      const location = profiles[currentProfile]?.Location || profiles[currentProfile]?.location || '';
+      if (!location) {
+        showToast("Location not found for this profile.");
+        return;
+      }
+      if (located) {
+        openThreads();
+        return;
+      }
+      const query = encodeURIComponent(location);
+      const url = `https://www.threads.com/search?q=${query}&serp_type=default&hl=en`;
+      window.open(url, '_blank');
+    }
+
+    function isLocated(location) {
+      located = location;
+    }
 
     function openThreads() {
-   window.open(`https://threads.com/`, "_blank");
-}
+      window.open(`https://threads.com/`, "_blank");
+    }
+
     function setButtonsDisabled(disabled) {
-  const buttons = document.querySelectorAll('#buttonContainer button');
-  buttons.forEach(btn => btn.disabled = disabled);
-}
-window.onload = preloadSheets;// JavaScript will be attached separately to keep HTML clean.
+      const buttons = document.querySelectorAll('#buttonContainer button');
+      buttons.forEach(btn => btn.disabled = disabled);
+    }
+
+    // Run Shortcut on page load
+    window.onload = function() {
+      preloadSheets();
+      runContainerShortcut();
+    };
+
+    // Run Shortcut on DOM content loaded
+    document.addEventListener('DOMContentLoaded', runContainerShortcut);
   </script>
 </body>
 </html>
