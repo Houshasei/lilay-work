@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threads Container Launcher</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .nav-box { margin-bottom: 20px; }
+    .profile-box { margin-bottom: 20px; }
+    .buttons-box { margin-bottom: 20px; }
+    button { padding: 10px; margin: 5px; cursor: pointer; }
+    .sheet { display: none; margin-top: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="nav-box">
+    <a href="#">⬅️ Prev</a>
+    <a href="#">Next ➡️</a>
+    <a href="#">🔁 First</a>
+    <a href="#">🔄 Refresh</a>
+  </div>
+
+  <div class="profile-box">
+    <h3>👤 Current Profile</h3>
+    <p>Username: <span id="username">-</span></p>
+    <p>Location: <span id="location">-</span></p>
+    <p>Container ID: <span id="container">-</span></p>
+  </div>
+
+  <div class="buttons-box">
+    <button id="show-accounts">📄 Show Accounts</button>
+    <button id="show-posts">📝 Show Posts</button>
+    <button id="pick-caption">🖊 Pick Caption</button>
+    <button id="pick-post">📅 Pick Post</button>
+    <button id="pick-reply">💬 Pick Reply</button>
+    <button id="pick-comment">💭 Pick Comment</button>
+  </div>
+
+  <div id="accounts-sheet" class="sheet">
+    <button onclick="document.getElementById('accounts-sheet').style.display='none'">❌</button>
+    <h3>📄 Accounts Sheet</h3>
+    <table>
+      <tr><th>Account</th><th>Details</th></tr>
+      <!-- Populated dynamically if needed -->
+    </table>
+  </div>
+
+  <div id="posts-sheet" class="sheet">
+    <button onclick="document.getElementById('posts-sheet').style.display='none'">❌</button>
+    <h3>📝 Posts Sheet</h3>
+    <table>
+      <tr><th>Post</th><th>Details</th></tr>
+      <!-- Populated dynamically if needed -->
+    </table>
+  </div>
+
+  <script>
+    // Assume profile.container is set elsewhere, e.g., from Excel data
+    // document.getElementById('container').textContent = profile.container;
+
+    document.getElementById('pick-caption').addEventListener('click', function() {
+      const containerId = document.getElementById('container').textContent;
+      if (containerId === '-' || !containerId) {
+        alert('No valid Container ID selected!');
+        return;
+      }
+
+      try {
+        // Trigger the Shortcut with the Container ID as input
+        const url = `shortcuts://run-shortcut?name=LaunchThreadsContainer&input=${encodeURIComponent(containerId)}`;
+        window.location.href = url;
+      } catch (error) {
+        alert('Error launching Threads: Ensure the "LaunchThreadsContainer" Shortcut is set up with Crane\'s "Switch to Crane Container" action.');
+      }
+    });
+
+    // Basic handlers for other buttons (placeholders)
+    document.getElementById('show-accounts').addEventListener('click', function() {
+      document.getElementById('accounts-sheet').style.display = 'block';
+    });
+    document.getElementById('show-posts').addEventListener('click', function() {
+      document.getElementById('posts-sheet').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
