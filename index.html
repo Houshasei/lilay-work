@@ -131,16 +131,8 @@
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {};
 
-    // List of ThreadContainers
-    const threadContainers = [
-      'Threads1', 'Threads2', 'Threads3', 'Threads4', 'Threads5', 'Threads9', 'Threads11', 'Threads12', 'Threads13', 
-      'Threads14', 'Threads15', 'Threads17', 'Threads18', 'Threads21', 'Threads23', 'Threads24', 'Threads27', 'Threads31', 
-      'Threads33', 'Threads35', 'Threads36', 'Threads37', 'Threads38', 'Threads39', 'Threads40', 'Threads41', 'Threads42', 
-      'Threads43', 'Threads44', 'Threads45', 'Threads46', 'Threads47', 'Threads49', 'Threads50', 'Threads51', 'Threads52', 
-      'Threads53', 'Threads54', 'Threads55', 'Threads56', 'Threads57', 'Threads60', 'Threads61', 'Threads62', 'Threads63', 
-      'Threads64', 'Threads65', 'Threads66', 'Threads67', 'Threads68', 'Threads69', 'Threads70', 'Threads71', 'Threads72', 
-      'Threads73', 'Threads74', 'Threads75', 'Threads76', 'Threads77', 'Threads78', 'Threads79', 'Threads80'
-    ];
+    // List of ThreadContainers (dynamically generated from 1 to 100)
+    const threadContainers = Array.from({length: 100}, (_, i) => `Threads${i+1}`);
 
     // Function to run the matching Shortcut based on Container ID number
     function runContainerShortcut() {
