@@ -131,8 +131,8 @@
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {};
 
-    // List of ThreadContainers (dynamically generated from 1 to 100)
-    const threadContainers = Array.from({length: 100}, (_, i) => `Threads${i+1}`);
+    // List of ThreadContainers (dynamically generated from 1 to 300)
+    const threadContainers = Array.from({length: 300}, (_, i) => `Threads${i+1}`);
 
     // Function to run the matching Shortcut based on Container ID number
     function runContainerShortcut() {
