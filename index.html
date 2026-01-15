@@ -139,7 +139,7 @@
       const containerId = document.getElementById('container').innerText.trim();
       const containerNumber = parseInt(containerId, 10);
       const matchingThread = threadContainers.find(thread => {
-        const threadNumber = parseInt(thread.replace('Threads', ''), 10);
+        const threadNumber = parseInt(thread.replace('Instagram', ''), 10);
         return threadNumber === containerNumber;
       });
 
