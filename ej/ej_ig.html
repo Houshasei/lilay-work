@@ -586,13 +586,13 @@
         });
         const data = await response.json();
         if (data.success) {
-          showToast('Secret updated!');
+          showToast('Key written in sheet!');
           //preloadSheets(); // Refresh data
         } else {
-          showToast('Update failed');
+          showToast('Writing failed');
         }
       } catch (e) {
-        showToast('Update error');
+        showToast('Writing error');
       }
     }
 
