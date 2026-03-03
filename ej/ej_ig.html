@@ -121,7 +121,7 @@
     <h2 style="margin:0 0 8px; color: #e0e0e0;">👤 Creation Tools</h2>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Username:</strong> <span id="username" style="color: #e0e0e0;">-</span> <button onclick="copyUsername()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">IG Password:</strong> <span id="igpassword" style="color: #e0e0e0;">-</span> <button onclick="copyIgpassword()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
-    <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Location:</strong> <span id="location" style="color: #e0e0e0;">-</span> <button onclick="copyLocation()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
+    <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Location:</strong> <span id="location" style="color: #e0e0e0;">-</span> <button onclick="copyLocation(); switchExpressVPN()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Container ID:</strong> <span id="container" style="color: #e0e0e0;">-</span> <button onclick="copyContainer()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Name:</strong> <span id="name" style="color: #e0e0e0;">-</span> <button onclick="copyName()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Email:</strong> <span id="email" style="color: #e0e0e0;">-</span> <button onclick="copyEmail()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
@@ -1104,6 +1104,11 @@ async function resendSMS() {
 
     function openThreads() {
       window.open(`https://instagram.com/`, "_blank");
+    }
+
+    function switchExpressVPN() {
+        const shortcutUrl = `shortcuts://run-shortcut?name=SwitchEXP`;
+        window.location.href = shortcutUrl;
     }
 
     function setButtonsDisabled(disabled) {
