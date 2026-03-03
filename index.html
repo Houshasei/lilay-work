@@ -296,9 +296,11 @@
         showToast("No location to copy.");
         return;
       }
+      let copied = false;
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(location);
+          copied = true;
         } else {
           // Fallback for older browsers and mobile
           const input = document.createElement('input');
@@ -309,14 +311,23 @@
           document.body.appendChild(input);
           input.focus();
           input.select();
-          document.execCommand('copy');
+          const success = document.execCommand('copy');
           document.body.removeChild(input);
+          if (success) copied = true;
         }
+      } catch (e) {
+        // copy failed
+      }
+      if (copied) {
         showToast("Location copied!");
-        // Send POST request
+      } else {
+        showToast("Copy failed, please copy manually: " + location);
+      }
+      // Send POST request
+      try {
         await fetch('http://192.168.8.121:5000/api/script/openExpressVPN.py/run', { method: 'POST', mode: 'no-cors' });
       } catch (e) {
-        showToast("Failed to copy location or send request.");
+        showToast("Failed to send request.");
       }
     }
 
