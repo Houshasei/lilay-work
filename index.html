@@ -313,7 +313,7 @@
         }
         showToast("Location copied!");
         // Send POST request
-        await fetch('http://192.168.8.121:5000/api/script/openExpressVPN.py/run', { method: 'POST' });
+        await fetch('http://192.168.8.121:5000/api/script/openExpressVPN.py/run', { method: 'POST', mode: 'no-cors' });
       } catch (e) {
         showToast("Failed to copy location or send request.");
       }
