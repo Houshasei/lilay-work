@@ -301,15 +301,16 @@
           await navigator.clipboard.writeText(location);
         } else {
           // Fallback for older browsers and mobile
-          const textArea = document.createElement('textarea');
-          textArea.value = location;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-9999px';
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = location;
+          input.style.position = 'absolute';
+          input.style.left = '-9999px';
+          document.body.appendChild(input);
+          input.focus();
+          input.select();
           document.execCommand('copy');
-          document.body.removeChild(textArea);
+          document.body.removeChild(input);
         }
         showToast("Location copied!");
         // Send POST request
