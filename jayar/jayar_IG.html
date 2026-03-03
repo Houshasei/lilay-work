@@ -137,7 +137,11 @@
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
     <h3 style="margin:0 0 8px; color: #e0e0e0;">🔐 2FA Generator</h3>
-    <input type="text" id="totpSecret" placeholder="Paste 2FA secret here" onpaste="setTimeout(autoGenerateTOTP, 100)" style="width:100%; padding:1rem; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:1rem; box-sizing:border-box; margin-bottom:10px;">
+    <div style="position:relative; margin-bottom:10px;">
+  <input type="text" id="totpSecret" placeholder="Paste TOTP secret here" onpaste="setTimeout(autoGenerateTOTP, 100)" style="width:100%; padding:1rem; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:1rem; box-sizing:border-box;">
+  <button onclick="pasteSecret()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); padding:0.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#ffffff; border:none; border-radius:8px; font-size:0.8rem; cursor:pointer;">Paste</button>
+</div>
+
     <div style="display:flex; align-items:center; margin-bottom:10px;">
       <span id="totpDisplay" style="font-size:24px; font-weight:bold;">-</span>
       <button onclick="copyTOTP()" style="margin-left:5px; padding:0.5em 1em; font-size:1em;">Copy</button>
@@ -204,7 +208,7 @@
 
   <div id="toast"></div>
   <script>
-    const sheetUrl = 'https://script.google.com/macros/s/AKfycbxKK7dHIYk-CYeU5habvuK6TW45CpJoo-cvFYa6rwRpBi5NrMKvZTGCg5kED9nMogtC/exec';
+    const sheetUrl = 'https://script.google.com/macros/s/AKfycbxGvZJMI56QdWuymYETeWsVKLYM0WHg_6cergKarcUoKnZUATVyaJpdoyjZXF6JoNeE/exec';
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {}, totpInterval, profileOtpInterval, pollingInterval, currentOrderId, balanceInterval, lastFollowed = [], followCopyCount = 0, allFollowData = [], savedOrderCodes = [];
     let isResending = false;   // ← ADD THIS LINE (with the other let variables)
