@@ -120,6 +120,7 @@
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
     <h2 style="margin:0 0 8px; color: #e0e0e0;">👤 Creation Tools</h2>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Username:</strong> <span id="username" style="color: #e0e0e0;">-</span> <button onclick="copyUsername()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
+    <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">IG Password:</strong> <span id="igpassword" style="color: #e0e0e0;">-</span> <button onclick="copyIgpassword()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Location:</strong> <span id="location" style="color: #e0e0e0;">-</span> <button onclick="copyLocation()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Container ID:</strong> <span id="container" style="color: #e0e0e0;">-</span> <button onclick="copyContainer()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Name:</strong> <span id="name" style="color: #e0e0e0;">-</span> <button onclick="copyName()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
@@ -135,14 +136,14 @@
   </div>
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
-    <h3 style="margin:0 0 8px; color: #e0e0e0;">🔐 TOTP Generator</h3>
-    <input type="text" id="totpSecret" placeholder="Paste TOTP secret here" onpaste="setTimeout(autoGenerateTOTP, 100)" style="width:100%; padding:1rem; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:1rem; box-sizing:border-box; margin-bottom:10px;">
+    <h3 style="margin:0 0 8px; color: #e0e0e0;">🔐 2FA Generator</h3>
+    <input type="text" id="totpSecret" placeholder="Paste 2FA secret here" onpaste="setTimeout(autoGenerateTOTP, 100)" style="width:100%; padding:1rem; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:1rem; box-sizing:border-box; margin-bottom:10px;">
     <div style="display:flex; align-items:center; margin-bottom:10px;">
       <span id="totpDisplay" style="font-size:24px; font-weight:bold;">-</span>
       <button onclick="copyTOTP()" style="margin-left:5px; padding:0.5em 1em; font-size:1em;">Copy</button>
       <span id="modalTimer" style="font-size:12px; color:#666; margin-left:10px;">-</span>
     </div>
-    <button onclick="generateTOTP()">Generate TOTP</button>
+    <button onclick="generateTOTP()">Generate 2FA</button>
     <button onclick="resetTOTP()">Reset</button>
     <button onclick="updateSecret()">Write key to sheet</button>
   </div>
@@ -156,6 +157,9 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding:1rem; background:linear-gradient(135deg, #3a3a5e 0%, #4a4a7e 100%); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
       <span id="balanceText" style="font-weight:600; color:#e0e0e0; font-size:1rem;">Balance: Loading...</span>
       <button id="refreshBalanceBtn" onclick="getBalance()" style="background-color:rgba(255,255,255,0.2); color:#e0e0e0; border:1px solid rgba(255,255,255,0.3); padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:600;">Refresh</button>
+    </div>
+    <div style="margin-bottom:1.5rem; padding:1rem; background:linear-gradient(135deg, #3a3a5e 0%, #4a4a7e 100%); border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+      <span id="stockText" style="font-weight:600; color:#e0e0e0; font-size:1rem;">Instagram/Threads SMS available numbers: Loading...</span>
     </div>
     <div style="display:flex; gap:0.75rem; margin-bottom:1.5rem;">
       <button id="getNumberBtn" onclick="getNumber()" style="flex:1; border-radius:12px; padding:1rem; font-size:1rem; font-weight:600;">Get US Number</button>
@@ -203,6 +207,7 @@
     const sheetUrl = 'https://script.google.com/macros/s/AKfycbzjKZOh08apaS4syioR2--jcc7Hx7_IgJRzXRcfGTVP2GsUp2fZVqo_1NN8VfDKcyRF/exec';
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {}, totpInterval, profileOtpInterval, pollingInterval, currentOrderId, balanceInterval, lastFollowed = [], followCopyCount = 0, allFollowData = [], savedOrderCodes = [];
+    let isResending = false;   // ← ADD THIS LINE (with the other let variables)
 
     // List of ThreadContainers (dynamically generated from 1 to 300)
     const threadContainers = Array.from({length: 300}, (_, i) => `Instagram${i+1}`);
@@ -272,6 +277,7 @@
       document.getElementById('name').textContent = profile.name || '-';
       document.getElementById('email').textContent = profile.email || '-';
       document.getElementById('password').textContent = profile.password || '-';
+      document.getElementById('igpassword').textContent = profile.igpassword || '-';
       document.getElementById('secret').textContent = profile.secret || '-';
 
       // Stop previous OTP
@@ -450,6 +456,12 @@
       const password = document.getElementById('password').textContent;
       navigator.clipboard.writeText(password);
       showToast('Password copied!');
+    }
+
+    function copyIgpassword() {
+      const igpassword = document.getElementById('igpassword').textContent;
+      navigator.clipboard.writeText(igpassword);
+      showToast('IG Password copied!');
     }
 
     function copySecret() {
@@ -642,21 +654,23 @@
       return await apiCall('https://api.smspool.net/sms/cancel', formData);
     }
 
-    async function getHistory(apiKey) {
+  async function getHistory(apiKey) {
       const formData = new FormData();
       formData.append('key', apiKey);
       formData.append('start', '0');
       formData.append('length', '1000');
       formData.append('search', '');
+
       const response = await apiCall('https://api.smspool.net/request/history', formData);
       console.log('History response:', response);
+
       if (Array.isArray(response)) {
-        return response.map(order => order.order_code);
-      } else if (response.order_code) {
-        return [response.order_code];
+          return response;                    // ← now returns FULL objects
+      } else if (response && (response.order_code || response.orderid)) {
+          return [response];
       }
       throw new Error('Failed to fetch history');
-    }
+  }
 
     async function checkResend(apiKey, orderId) {
       const formData = new FormData();
@@ -665,12 +679,12 @@
       return await apiCall('https://api.smspool.net/sms/check_resend', formData);
     }
 
-    async function resendSMS(apiKey, orderId) {
-      const formData = new FormData();
-      formData.append('key', apiKey);
-      formData.append('orderid', orderId);
-      return await apiCall('https://api.smspool.net/sms/resend', formData);
-    }
+  async function apiResendSMS(apiKey, orderId) {
+    const formData = new FormData();
+    formData.append('key', apiKey);
+    formData.append('orderid', orderId);
+    return await apiCall('https://api.smspool.net/sms/resend', formData);
+  }
 
     function updateStatus(message, type = '') {
       const statusEl = document.getElementById('status');
@@ -713,7 +727,10 @@
 
         updateStatus('Preparing number...', 'loading');
 
+        let attempts = 0;
         pollingInterval = setInterval(async () => {
+          attempts++;
+          updateStatus(`Waiting for SMS... (attempt ${attempts})`, 'loading');
           try {
             const smsCheck = await checkSMS(apiKey, currentOrderId);
             console.log('SMS Check Response:', smsCheck);
@@ -746,10 +763,19 @@
       }
     }
 
+    async function getStock(apiKey) {
+      const formData = new FormData();
+      formData.append('key', apiKey);
+      formData.append('service', '457');
+      formData.append('country', '1');
+      return await apiCall('https://api.smspool.net/sms/stock', formData);
+    }
+
     async function getBalance() {
       const apiKey = document.getElementById('apiKey').value.trim();
       if (!apiKey) {
         document.getElementById('balanceText').textContent = 'Balance: Enter API key';
+        document.getElementById('stockText').textContent = 'Instagram/Threads SMS available numbers: Enter API key';
         return;
       }
 
@@ -783,9 +809,18 @@
         } else {
           document.getElementById('balanceText').textContent = 'Balance: $0.00';
         }
+
+        // Fetch stock
+        const stock = await getStock(apiKey);
+        if (stock && stock.success && stock.amount !== undefined) {
+          document.getElementById('stockText').textContent = `Instagram/Threads SMS available numbers: ${stock.amount}`;
+        } else {
+          document.getElementById('stockText').textContent = 'Instagram/Threads SMS available numbers: Error';
+        }
       } catch (error) {
         document.getElementById('balanceText').textContent = 'Balance: Error';
-        console.error('Balance error:', error);
+        document.getElementById('stockText').textContent = 'Instagram/Threads SMS available numbers: Error';
+        console.error('Balance/Stock error:', error);
       }
 
       btn.disabled = false;
@@ -845,77 +880,98 @@
       cancelBtn.textContent = 'Cancel Order';
     }
 
-    async function resendSMS() {
-      const apiKey = document.getElementById('apiKey').value.trim();
-      if (!apiKey) {
+async function resendSMS() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) {
         updateStatus('Please enter your API key', 'error');
         return;
-      }
-
-      const resendBtn = document.querySelector('button[onclick="resendSMS()"]');
-      resendBtn.disabled = true;
-
-      updateStatus('Fetching history...', 'loading');
-
-      try {
-        let orderCodes = savedOrderCodes;
-        if (orderCodes.length === 0) {
-          updateStatus('Loading history...', 'loading');
-          orderCodes = await getHistory(apiKey);
-          savedOrderCodes = orderCodes;
-          if (orderCodes.length === 0) {
-            updateStatus('No history available', 'error');
-            return;
-          }
-        }
-        const uniqueOrderCodes = [...new Set(orderCodes)];
-        if (uniqueOrderCodes.length === 0) {
-          updateStatus('No orders available for resend', 'error');
-          return;
-        }
-        const randomOrder = uniqueOrderCodes[Math.floor(Math.random() * uniqueOrderCodes.length)];
-
-        try {
-          const check = await checkResend(apiKey, randomOrder);
-          if (check && check.message === "This phonenumber is available for resend!") {
-            const foundOrder = randomOrder;
-          } else {
-            updateStatus('Selected order not available for resend', 'error');
-            return;
-          }
-        } catch (e) {
-          updateStatus('Check resend failed', 'error');
-          return;
-        }
-        const foundOrder = randomOrder;
-
-        updateStatus('Resending SMS...', 'loading');
-
-        const resend = await resendSMS(apiKey, foundOrder);
-        if (resend.success) {
-          // Start polling for the resent SMS
-          currentOrderId = foundOrder;
-          pollingInterval = setInterval(async () => {
-            try {
-              const smsCheck = await checkSMS(apiKey, currentOrderId);
-              if (smsCheck && smsCheck.sms) {
-                clearInterval(pollingInterval);
-                showSMS(smsCheck.sms);
-                updateStatus('SMS resent successfully!', 'success');
-              }
-            } catch (error) {
-              console.error('Polling error:', error);
-            }
-          }, 5000);
-        } else {
-          updateStatus('Resend failed', 'error');
-        }
-      } catch (error) {
-        updateStatus(error.message, 'error');
-      } finally {
-        resendBtn.disabled = false;
-      }
     }
+
+    if (isResending) {
+        showToast("Already searching...");
+        return;
+    }
+
+    isResending = true;
+    const resendBtn = document.querySelector('button[onclick="resendSMS()"]');
+    resendBtn.disabled = true;
+    resendBtn.textContent = 'Searching recent orders...';
+
+    updateStatus('Fetching order history...', 'loading');
+
+    try {
+        const history = await getHistory(apiKey);
+
+        if (!Array.isArray(history) || history.length === 0) {
+            throw new Error('No previous orders found');
+        }
+
+        const MAX_CHECKS = 50;
+        const recentHistory = history.slice(0, MAX_CHECKS);
+
+        updateStatus(`Checking ${recentHistory.length} recent orders...`, 'loading');
+
+        for (let i = 0; i < recentHistory.length; i++) {
+            const order = recentHistory[i];
+            const orderCode = order.order_code || order.orderid;
+            if (!orderCode) continue;
+
+            updateStatus(`Checking order ${i + 1}/${recentHistory.length}...`, 'loading');
+
+            try {
+                const check = await checkResend(apiKey, orderCode);
+
+                if (check && check.success === 1 && check.message === "This phonenumber is available for resend!") {
+                    
+                    updateStatus('Found resendable number! Resending now...', 'loading');
+
+                    const resendResult = await apiResendSMS(apiKey, orderCode);
+
+                    if (resendResult.success) {
+                        currentOrderId = orderCode;
+
+                        // === INSTANT PHONE NUMBER FROM HISTORY ===
+                        const phoneNumber = order.number || order.phonenumber || "Unknown";
+                        showNumber(phoneNumber);
+                        document.getElementById('cancelBtn').style.display = 'block';
+                        // ===========================================
+
+                        // Start polling for SMS
+                        let resendAttempts = 0;
+                        pollingInterval = setInterval(async () => {
+                            resendAttempts++;
+                            updateStatus(`Waiting for resent SMS... (attempt ${resendAttempts})`, 'loading');
+                            try {
+                                const smsCheck = await checkSMS(apiKey, currentOrderId);
+                                if (smsCheck && smsCheck.sms) {
+                                    clearInterval(pollingInterval);
+                                    showSMS(smsCheck.sms);
+                                    document.getElementById('cancelBtn').style.display = 'none';
+                                    updateStatus('SMS resent successfully!', 'success');
+                                }
+                            } catch (e) {}
+                        }, 5000);
+
+                        showToast('✅ Resending to: ' + phoneNumber);
+                        return;   // STOP — we’re done
+                    }
+                }
+            } catch (err) {
+                // skip bad orders
+            }
+        }
+
+        throw new Error('No resendable number in the last 30 orders');
+
+    } catch (error) {
+        updateStatus(error.message, 'error');
+        showToast(error.message);
+    } finally {
+        isResending = false;
+        resendBtn.disabled = false;
+        resendBtn.textContent = 'Resend';
+    }
+  }
 
     function resetSMS() {
       if (pollingInterval) {
