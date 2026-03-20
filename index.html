@@ -219,14 +219,14 @@
     let isResending = false;   // ← ADD THIS LINE (with the other let variables)
 
     // List of ThreadContainers (dynamically generated from 1 to 300)
-    const threadContainers = Array.from({length: 300}, (_, i) => `Threads${i+1}`);
+    const threadContainers = Array.from({length: 300}, (_, i) => `Instagram${i+1}`);
 
     // Function to run the matching Shortcut based on Container ID number
     function runContainerShortcut() {
       const containerId = document.getElementById('container').innerText.trim();
       const containerNumber = parseInt(containerId, 10);
       const matchingThread = threadContainers.find(thread => {
-        const threadNumber = parseInt(thread.replace('Threads', ''), 10);
+        const threadNumber = parseInt(thread.replace('Instagram', ''), 10);
         return threadNumber === containerNumber;
       });
 
