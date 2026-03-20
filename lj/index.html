@@ -130,6 +130,13 @@
     <div><strong style="color: #b0b0b0;">OTP:</strong> <span id="otpCode" style="color: #e0e0e0;">-</span> <span id="otpTimer" style="font-size:12px; color:#888;">-</span> <button onclick="copyCurrentOTP()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
   </div>
   <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px;">
+    <button onclick="pickRandom('Caption'); openThreads()">🖊 Pick Caption</button>
+    <button onclick="pickTodayPost(); openThreads()">📅 Pick Post</button>
+    <button onclick="pickRandom('Reply'); openThreads()">💬 Pick Reply</button>
+    <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
+    <button onclick="showModal('profileModal')">📄 Show Accounts</button>
+    <button onclick="showModal('postsModal')">📝 Show Posts</button>
+    <button onclick="pickFollow(); openThreads()">👥 Follow People</button>
     <button onclick="showModal('profileModal')">📄 Show Accounts</button>
     <button onclick="showModal('postsModal')">📝 Show Posts</button>
     <button onclick="pickFollow(); openThreads()">👥 Follow People</button>
