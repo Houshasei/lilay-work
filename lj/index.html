@@ -136,7 +136,7 @@
     <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
     <button onclick="showModal('profileModal')">📄 Show Accounts</button>
     <button onclick="showModal('postsModal')">📝 Show Posts</button>
-    <button onclick="pickFollow(); openThreads()">👥 Follow People</button>
+    <button onclick="pickFollow(); openInstagram()">👥 Follow People</button>
   </div>
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
@@ -1111,6 +1111,10 @@ async function resendSMS() {
     }
 
     function openThreads() {
+      window.open(`https://www.threads.com/`, "_blank");
+    }
+
+    function openInstagram() {
       window.open(`https://www.instagram.com/`, "_blank");
     }
 
