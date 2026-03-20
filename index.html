@@ -123,6 +123,7 @@
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">IG Password:</strong> <span id="igpassword" style="color: #e0e0e0;">-</span> <button onclick="copyIgpassword()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Location:</strong> <span id="location" style="color: #e0e0e0;">-</span> <button onclick="copyLocation(); switchExpressVPN()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Container ID:</strong> <span id="container" style="color: #e0e0e0;">-</span> <button onclick="copyContainer()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
+    <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Reel #:</strong> <span id="reel" style="color: #e0e0e0;">-</span></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Name:</strong> <span id="name" style="color: #e0e0e0;">-</span> <button onclick="copyName()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Email:</strong> <span id="email" style="color: #e0e0e0;">-</span> <button onclick="copyEmail()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Password:</strong> <span id="password" style="color: #e0e0e0;">-</span> <button onclick="copyPassword()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
@@ -136,7 +137,7 @@
     <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
     <button onclick="showModal('profileModal')">📄 Show Accounts</button>
     <button onclick="showModal('postsModal')">📝 Show Posts</button>
-    <button onclick="pickFollow(); openThreads()">👥 Follow People</button>
+    <button onclick="pickFollow(); openInstagram()">👥 Follow People</button>
   </div>
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
@@ -282,6 +283,7 @@
       document.getElementById('username').textContent = profile.username || '-';
       document.getElementById('location').textContent = profile.location || '-';
       document.getElementById('container').textContent = profile.container || '-';
+      document.getElementById('reel').textContent = profile.reel || '-';
       document.getElementById('name').textContent = profile.name || '-';
       document.getElementById('email').textContent = profile.email || '-';
       document.getElementById('password').textContent = profile.password || '-';
@@ -1112,6 +1114,10 @@ async function resendSMS() {
 
     function openThreads() {
       window.open(`https://www.threads.com/`, "_blank");
+    }
+
+    function openInstagram() {
+      window.open(`https://www.instagram.com/`, "_blank");
     }
 
     function switchExpressVPN() {
