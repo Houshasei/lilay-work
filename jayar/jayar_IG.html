@@ -775,7 +775,8 @@
             }
           }, 5000);
         } else { // 5SIM
-          const res = await fetch('https://5sim.net/v1/user/buy/activation/usa/any/instagram', {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const res = await fetch(`${proxyUrl}/api/user/buy/activation/usa/any/instagram`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
           });
@@ -793,7 +794,7 @@
           updateStatus('Number bought! Polling for SMS...', 'loading');
 
           pollingInterval = setInterval(async () => {
-            const checkRes = await fetch(`https://5sim.net/v1/user/check/${currentOrderId}`, {
+            const checkRes = await fetch(`${proxyUrl}/api/user/check/${currentOrderId}`, {
               method: 'GET',
               headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
             });
@@ -863,13 +864,14 @@
           document.getElementById('stockText').textContent = stock && stock.success && stock.amount !== undefined ? 
             `Instagram/Threads SMS available numbers: ${stock.amount}` : 'Instagram/Threads SMS available numbers: Error';
 } else { // 5SIM
-  const res = await fetch('https://5sim.net/v1/user/profile', {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + key,
-      'Accept': 'application/json'
-    }
-  });
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const res = await fetch(`${proxyUrl}/api/user/profile`, {
+            method: 'GET',
+            headers: {
+              'Authorization': 'Bearer ' + key,
+              'Accept': 'application/json'
+            }
+          });
           if (!res.ok) {
             const errorText = await res.text();
             throw new Error(`5SIM API error (${res.status}): ${errorText}`);
@@ -878,7 +880,7 @@
           document.getElementById('balanceText').textContent = `Balance: $${parseFloat(data.balance || 0).toFixed(2)}`;
 
           // Get stock from prices API
-          const stockRes = await fetch('https://5sim.net/v1/guest/prices?country=usa&product=instagram', {
+          const stockRes = await fetch(`${proxyUrl}/api/guest/prices?country=usa&product=instagram`, {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
           });
@@ -932,7 +934,8 @@
 
       try {
         if (currentProvider === '5sim') {
-          const cancelRes = await fetch(`https://5sim.net/v1/user/cancel/${currentOrderId}`, {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const cancelRes = await fetch(`${proxyUrl}/api/user/cancel/${currentOrderId}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
           });
@@ -1062,7 +1065,8 @@ async function resendSMS() {
       if (currentProvider === '5sim' && currentOrderId) {
         // Finish the order for 5SIM
         try {
-          const finishRes = await fetch(`https://5sim.net/v1/user/finish/${currentOrderId}`, {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const finishRes = await fetch(`${proxyUrl}/api/user/finish/${currentOrderId}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + document.getElementById('apiKey').value.trim(), 'Accept': 'application/json' }
           });
