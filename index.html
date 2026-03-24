@@ -118,7 +118,10 @@
     <button onclick="preloadSheets(); isLocated(false)">🔄 Refresh</button>
   </div>
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
-    <h2 style="margin:0 0 8px; color: #e0e0e0;">👤 Creation Tools</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h2 style="margin:0; color: #e0e0e0;">👤 Creation Tools</h2>
+      <button onclick="openSettingsModal()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 8px; padding: 6px 12px; font-size: 14px; cursor: pointer;">⚙️ Settings</button>
+    </div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Username:</strong> <span id="username" style="color: #e0e0e0;">-</span> <button onclick="copyUsername()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">IG Password:</strong> <span id="igpassword" style="color: #e0e0e0;">-</span> <button onclick="copyIgpassword()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
     <div style="margin-bottom: 8px;"><strong style="color: #b0b0b0;">Location:</strong> <span id="location" style="color: #e0e0e0;">-</span> <button onclick="copyLocation(); switchExpressVPN()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
@@ -131,17 +134,21 @@
     <div><strong style="color: #b0b0b0;">OTP:</strong> <span id="otpCode" style="color: #e0e0e0;">-</span> <span id="otpTimer" style="font-size:12px; color:#888;">-</span> <button onclick="copyCurrentOTP()" style="padding:4px 8px; font-size:12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Copy</button></div>
   </div>
   <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px;">
-    <button onclick="pickRandom('Caption'); openThreads()">🖊 Pick Caption</button>
-    <button onclick="pickTodayPost(); openThreads()">📅 Pick Post</button>
-    <button onclick="pickRandom('Reply'); openThreads()">💬 Pick Reply</button>
-    <button onclick="pickRandom('Comments'); openThreads()">💭 Pick Comment</button>
+    <button onclick="pickRandom('Caption'); openPlatform()">🖊 Pick Caption</button>
+    <button onclick="pickTodayPost(); openPlatform()">📅 Pick Post</button>
+    <button onclick="pickRandom('Reply'); openPlatform()">💬 Pick Reply</button>
+    <button onclick="pickRandom('Comments'); openPlatform()">💭 Pick Comment</button>
     <button onclick="showModal('profileModal')">📄 Show Accounts</button>
     <button onclick="showModal('postsModal')">📝 Show Posts</button>
-    <button onclick="pickFollow(); openInstagram()">👥 Follow People</button>
+    <button onclick="pickFollow(); openPlatform()">👥 Follow People</button>
   </div>
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
-    <h3 style="margin:0 0 8px; color: #e0e0e0;">🔐 2FA Generator</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h3 style="margin:0; color: #e0e0e0;">🔐 2FA Generator</h3>
+      <button onclick="toggleSection('tfa')" id="tfaToggleBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 8px; padding: 4px 8px; font-size: 12px; cursor: pointer;">−</button>
+    </div>
+    <div id="tfaContent">
     <div style="position:relative; margin-bottom:10px;">
   <input type="text" id="totpSecret" placeholder="Paste TOTP secret here" onpaste="setTimeout(autoGenerateTOTP, 100)" style="width:100%; padding:1rem; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:1rem; box-sizing:border-box;">
   <button onclick="pasteSecret()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); padding:0.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#ffffff; border:none; border-radius:8px; font-size:0.8rem; cursor:pointer;">Paste</button>
@@ -156,14 +163,19 @@
     <button onclick="resetTOTP()">Reset</button>
     <button onclick="updateSecret()">Write key to sheet</button>
   </div>
+  </div>
 
   <div style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); padding:16px; margin-bottom:16px; border: 1px solid rgba(255,255,255,0.1);">
-    <h3 style="margin:0 0 8px; color: #e0e0e0;">📱 SMS Provider (USA + Instagram only)
-      <select id="smsProvider" style="background:#333;color:#fff;border:1px solid #555;padding:4px 8px;border-radius:8px;font-size:0.9rem;">
-        <option value="smspool">SMSPool.net</option>
-        <option value="5sim">5SIM.net</option>
-      </select>
-    </h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h3 style="margin:0; color: #e0e0e0;">📱 SMS Provider (USA + Instagram only)
+        <select id="smsProvider" style="background:#333;color:#fff;border:1px solid #555;padding:4px 8px;border-radius:8px;font-size:0.9rem;">
+          <option value="smspool">SMSPool.net</option>
+          <option value="5sim">5SIM.net</option>
+        </select>
+      </h3>
+      <button onclick="toggleSection('sms')" id="smsToggleBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 8px; padding: 4px 8px; font-size: 12px; cursor: pointer;">−</button>
+    </div>
+    <div id="smsContent">
     <div style="margin-bottom:1.5rem;">
       <label for="apiKey" style="display:block; margin-bottom:0.75rem; font-weight:600; color:#b0b0b0; font-size:0.9rem;">
         API Key / Bearer Token:
@@ -217,25 +229,57 @@
     </div>
   </div>
 
-
+  <div id="settingsModal" class="modal">
+    <div class="modal-content" style="background: linear-gradient(135deg, #2a2a3e 0%, #3a3a5e 100%); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1);">
+      <button onclick="hideModal('settingsModal')" style="position:absolute; top:10px; left:10px; background:#ffdddd; border:none; border-radius:6px; padding:4px 10px;">❌</button>
+      <h3 style="margin-top:0; color: #e0e0e0;">⚙️ Settings</h3>
+      <div style="margin-bottom: 16px;">
+        <label for="userSelect" style="display:block; margin-bottom:8px; font-weight:600; color:#b0b0b0;">User:</label>
+        <select id="userSelect" style="width:100%; padding:10px; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:16px;">
+          <option value="Ces">Ces</option>
+          <option value="JayAr">JayAr</option>
+          <option value="LJ">LJ</option>
+          <option value="EJ">EJ</option>
+        </select>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label for="platformSelect" style="display:block; margin-bottom:8px; font-weight:600; color:#b0b0b0;">Platform:</label>
+        <select id="platformSelect" style="width:100%; padding:10px; border:2px solid #555; border-radius:12px; background-color:#333; color:#e0e0e0; font-size:16px;">
+          <option value="Instagram">Instagram</option>
+          <option value="Threads">Threads</option>
+        </select>
+      </div>
+      <button onclick="saveSettings()" style="width:100%; padding:12px; font-size:16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; border-radius: 12px; cursor: pointer;">Save Settings</button>
+    </div>
+  </div>
 
   <div id="toast"></div>
   <script>
-    const sheetUrl = 'https://script.google.com/macros/s/AKfycbwsktB8WNkDY7-meRmVEDBHmvsOGte0HjGtsDpd3sCHE5ulk2vNnskLVQwF0MDZsxNjoQ/exec';
+    const userConfig = {
+      Ces: { id: 'AKfycbwsktB8WNkDY7-meRmVEDBHmvsOGte0HjGtsDpd3sCHE5ulk2vNnskLVQwF0MDZsxNjoQ' },
+      JayAr: { id: 'AKfycbxGvZJMI56QdWuymYETeWsVKLYM0WHg_6cergKarcUoKnZUATVyaJpdoyjZXF6JoNeE' },
+      LJ: { id: 'AKfycbwL5hpGZ2vq7nos3V7vouEEgnaeKgoVPN9w7MEavlM6YGgSIYhwg6VpFGpv5mkitt_R' },
+      EJ: { id: 'AKfycbw66O-DXukXjUij-6cuG1af8Cu_p3yzIkXFOGCm_mjARDoEXfqLlFg_E-uw09iP90sk' }
+    };
+
+    let currentUser = localStorage.getItem('currentUser') || 'Ces';
+    let currentPlatform = localStorage.getItem('currentPlatform') || 'Instagram';
+    let sheetUrl = `https://script.google.com/macros/s/${userConfig[currentUser].id}/exec`;
+
     let profiles = [], currentProfile = 0, located = false;
     let sheetCache = {}, pickedPostIndexes = {}, totpInterval, profileOtpInterval, pollingInterval, currentOrderId, balanceInterval, lastFollowed = [], followCopyCount = 0, allFollowData = [], savedOrderCodes = [];
     let isResending = false;
         let currentProvider = 'smspool';
 
     // List of ThreadContainers (dynamically generated from 1 to 300)
-    const threadContainers = Array.from({length: 300}, (_, i) => `Instagram${i+1}`);
+    let threadContainers = Array.from({length: 300}, (_, i) => `${currentPlatform}${i+1}`);
 
     // Function to run the matching Shortcut based on Container ID number
     function runContainerShortcut() {
       const containerId = document.getElementById('container').innerText.trim();
       const containerNumber = parseInt(containerId, 10);
       const matchingThread = threadContainers.find(thread => {
-        const threadNumber = parseInt(thread.replace('Instagram', ''), 10);
+        const threadNumber = parseInt(thread.replace(currentPlatform, ''), 10);
         return threadNumber === containerNumber;
       });
 
@@ -261,7 +305,23 @@
         setButtonsDisabled(true);
         showToast("Refreshing data...");
 
+        // Clear current data
+        profiles = [];
+        displayProfile(0);
+        document.getElementById('username').textContent = '-';
+        document.getElementById('location').textContent = '-';
+        document.getElementById('container').textContent = '-';
+        document.getElementById('name').textContent = '-';
+        document.getElementById('email').textContent = '-';
+        document.getElementById('password').textContent = '-';
+        document.getElementById('igpassword').textContent = '-';
+        document.getElementById('reel').textContent = '-';
+        document.getElementById('secret').textContent = '-';
+        document.getElementById('otpCode').textContent = '-';
+        document.getElementById('otpTimer').textContent = '-';
+
         sheetCache = {};
+        sheetUrl = `https://script.google.com/macros/s/${userConfig[currentUser].id}/exec`;
         const savedIndex = parseInt(localStorage.getItem('lastProfileIndex')) || 0;
 
         profiles = await fetchSheet('Accounts');
@@ -775,7 +835,8 @@
             }
           }, 5000);
         } else { // 5SIM
-          const res = await fetch('https://5sim.net/v1/user/buy/activation/usa/any/instagram', {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const res = await fetch(`${proxyUrl}/api/user/buy/activation/usa/any/instagram`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
           });
@@ -793,7 +854,7 @@
           updateStatus('Number bought! Polling for SMS...', 'loading');
 
           pollingInterval = setInterval(async () => {
-            const checkRes = await fetch(`https://5sim.net/v1/user/check/${currentOrderId}`, {
+            const checkRes = await fetch(`${proxyUrl}/api/user/check/${currentOrderId}`, {
               method: 'GET',
               headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
             });
@@ -863,13 +924,14 @@
           document.getElementById('stockText').textContent = stock && stock.success && stock.amount !== undefined ? 
             `Instagram/Threads SMS available numbers: ${stock.amount}` : 'Instagram/Threads SMS available numbers: Error';
 } else { // 5SIM
-  const res = await fetch('https://5sim.net/v1/user/profile', {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + key,
-      'Accept': 'application/json'
-    }
-  });
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const res = await fetch(`${proxyUrl}/api/user/profile`, {
+            method: 'GET',
+            headers: {
+              'Authorization': 'Bearer ' + key,
+              'Accept': 'application/json'
+            }
+          });
           if (!res.ok) {
             const errorText = await res.text();
             throw new Error(`5SIM API error (${res.status}): ${errorText}`);
@@ -878,7 +940,7 @@
           document.getElementById('balanceText').textContent = `Balance: $${parseFloat(data.balance || 0).toFixed(2)}`;
 
           // Get stock from prices API
-          const stockRes = await fetch('https://5sim.net/v1/guest/prices?country=usa&product=instagram', {
+          const stockRes = await fetch(`${proxyUrl}/api/guest/prices?country=usa&product=instagram`, {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
           });
@@ -932,7 +994,8 @@
 
       try {
         if (currentProvider === '5sim') {
-          const cancelRes = await fetch(`https://5sim.net/v1/user/cancel/${currentOrderId}`, {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const cancelRes = await fetch(`${proxyUrl}/api/user/cancel/${currentOrderId}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + apiKey, 'Accept': 'application/json' }
           });
@@ -1062,7 +1125,8 @@ async function resendSMS() {
       if (currentProvider === '5sim' && currentOrderId) {
         // Finish the order for 5SIM
         try {
-          const finishRes = await fetch(`https://5sim.net/v1/user/finish/${currentOrderId}`, {
+          const proxyUrl = 'https://crimson-surf-e7af.houshasei.workers.dev/'; // Replace with your Cloudflare Worker URL
+          const finishRes = await fetch(`${proxyUrl}/api/user/finish/${currentOrderId}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + document.getElementById('apiKey').value.trim(), 'Accept': 'application/json' }
           });
@@ -1161,12 +1225,30 @@ async function resendSMS() {
       const btn = document.getElementById('lockBtn');
       if (input.disabled) {
         input.disabled = false;
+        input.style.display = 'block';
         btn.textContent = '🔒 Lock';
         btn.style.background = '#ff6b6b';
+        localStorage.setItem('apiKeyLocked', 'false');
       } else {
         input.disabled = true;
+        input.style.display = 'none';
         btn.textContent = '🔓 Unlock';
         btn.style.background = '#51cf66';
+        localStorage.setItem('apiKeyLocked', 'true');
+      }
+    }
+
+    function toggleSection(sectionId) {
+      const content = document.getElementById(sectionId + 'Content');
+      const btn = document.getElementById(sectionId + 'ToggleBtn');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.textContent = '−';
+        localStorage.setItem(sectionId + 'Minimized', 'false');
+      } else {
+        content.style.display = 'none';
+        btn.textContent = '+';
+        localStorage.setItem(sectionId + 'Minimized', 'true');
       }
     }
 
@@ -1242,12 +1324,94 @@ async function resendSMS() {
       buttons.forEach(btn => btn.disabled = disabled);
     }
 
+    function openSettingsModal() {
+      document.getElementById('userSelect').value = currentUser;
+      document.getElementById('platformSelect').value = currentPlatform;
+      showModal('settingsModal');
+    }
+
+    function saveSettings() {
+      const newUser = document.getElementById('userSelect').value;
+      const newPlatform = document.getElementById('platformSelect').value;
+
+      if (newUser !== currentUser || newPlatform !== currentPlatform) {
+        currentUser = newUser;
+        currentPlatform = newPlatform;
+        localStorage.setItem('currentUser', currentUser);
+        localStorage.setItem('currentPlatform', currentPlatform);
+        threadContainers = Array.from({length: 300}, (_, i) => `${currentPlatform}${i+1}`);
+        preloadSheets();
+      }
+
+      hideModal('settingsModal');
+      showToast('Settings saved!');
+    }
+
+    function openPlatform() {
+      if (currentPlatform === 'Instagram') {
+        openInstagram();
+      } else if (currentPlatform === 'Threads') {
+        openThreads();
+      }
+    }
+
     window.onload = function() {
+      // Initialize API key lock state
+      const apiKeyLocked = localStorage.getItem('apiKeyLocked') === 'true';
+      const input = document.getElementById('apiKey');
+      const btn = document.getElementById('lockBtn');
+      if (apiKeyLocked) {
+        input.disabled = true;
+        input.style.display = 'none';
+        btn.textContent = '🔓 Unlock';
+        btn.style.background = '#51cf66';
+      } else {
+        input.disabled = false;
+        input.style.display = 'block';
+        btn.textContent = '🔒 Lock';
+        btn.style.background = '#ff6b6b';
+      }
+
+      // Initialize section states
+      const tfaMinimized = localStorage.getItem('tfaMinimized') === 'true';
+      const smsMinimized = localStorage.getItem('smsMinimized') === 'true';
+
+      const tfaContent = document.getElementById('tfaContent');
+      const tfaBtn = document.getElementById('tfaToggleBtn');
+      if (tfaMinimized) {
+        tfaContent.style.display = 'none';
+        tfaBtn.textContent = '+';
+      } else {
+        tfaContent.style.display = 'block';
+        tfaBtn.textContent = '−';
+      }
+
+      const smsContent = document.getElementById('smsContent');
+      const smsBtn = document.getElementById('smsToggleBtn');
+      if (smsMinimized) {
+        smsContent.style.display = 'none';
+        smsBtn.textContent = '+';
+      } else {
+        smsContent.style.display = 'block';
+        smsBtn.textContent = '−';
+      }
+
+      // Restore scroll position
+      const savedScrollY = localStorage.getItem('scrollPosition');
+      if (savedScrollY) {
+        window.scrollTo(0, parseInt(savedScrollY));
+      }
+
       preloadSheets();
       runContainerShortcut();
     };
 
     document.addEventListener('DOMContentLoaded', runContainerShortcut);
+
+    // Save scroll position on scroll
+    window.addEventListener('scroll', () => {
+      localStorage.setItem('scrollPosition', window.scrollY.toString());
+    });
   </script>
 </body>
 </html>
