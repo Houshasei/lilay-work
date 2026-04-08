@@ -113,7 +113,7 @@
 <body>
    <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">
     <button onclick="prevProfile(); isLocated(false)">⬅️ Prev</button>
-    <button onclick="nextProfile(); isLocated(false); switchContainer(container_name)">Next ➡️</button>
+    <button onclick="nextProfile(); isLocated(false)">Next ➡️</button>
     <button onclick="goToFirstProfile(); isLocated(false)">🔁 First </button>
     <button onclick="preloadSheets(); isLocated(false)">🔄 Refresh</button>
   </div>
@@ -277,21 +277,21 @@
     let threadContainers = Array.from({length: 300}, (_, i) => `${currentPlatform}${i+1}`);
 
     // Function to run the matching Shortcut based on Container ID number
-    // function runContainerShortcut() {
-    //   const containerId = document.getElementById('container').innerText.trim();
-    //   const containerNumber = parseInt(containerId, 10);
-    //   const matchingThread = threadContainers.find(thread => {
-    //     const threadNumber = parseInt(thread.replace(currentPlatform, ''), 10);
-    //     return threadNumber === containerNumber;
-    //   });
+    function runContainerShortcut() {
+      const containerId = document.getElementById('container').innerText.trim();
+      const containerNumber = parseInt(containerId, 10);
+      const matchingThread = threadContainers.find(thread => {
+        const threadNumber = parseInt(thread.replace(currentPlatform, ''), 10);
+        return threadNumber === containerNumber;
+      });
 
-    //   if (matchingThread) {
-    //     const shortcutUrl = `shortcuts://run-shortcut?name=${matchingThread}`;
-    //     window.location.href = shortcutUrl;
-    //   } else {
-    //     console.log('No matching ThreadContainer found for Container ID:', containerId);
-    //   }
-    // }
+      if (matchingThread) {
+        const shortcutUrl = `shortcuts://run-shortcut?name=${matchingThread}`;
+        window.location.href = shortcutUrl;
+      } else {
+        console.log('No matching ThreadContainer found for Container ID:', containerId);
+      }
+    }
 
     async function fetchSheet(sheetName) {
       if (sheetCache[sheetName]) return sheetCache[sheetName];
@@ -337,7 +337,7 @@
 
         showToast("Sheets refreshed!");
         displayProfile(savedIndex);
-        // switchContainer(container_name); // Run Shortcut after data refresh
+        runContainerShortcut(); // Run Shortcut after data refresh
       } catch (e) {
         showToast("Refresh failed");
       } finally {
@@ -377,18 +377,8 @@
         }
       }
 
-      // switchContainer(container_name); // Run Shortcut after profile display
+      runContainerShortcut(); // Run Shortcut after profile display
     }
-
-    const container_name = document.getElementById('container').innerText.trim();
-
-    function switchContainer(containerName) {
-    const shortcutName = "SwitchInstagramContainer";
-    
-    const url = `shortcuts://run-shortcut?name=${encodeURIComponent(shortcutName)}&input=text&text=${encodeURIComponent(containerName)}`;
-    
-    window.location.href = url;
-}
 
     function nextProfile() { displayProfile(currentProfile + 1); }
     function prevProfile() { displayProfile(currentProfile - 1); }
@@ -1415,10 +1405,10 @@ async function resendSMS() {
       }
 
       preloadSheets();
-      // switchContainer(container_name);
+      runContainerShortcut();
     };
 
-    // document.addEventListener('DOMContentLoaded', switchContainer(container_name));
+    document.addEventListener('DOMContentLoaded', runContainerShortcut);
 
     // Save scroll position on scroll
     window.addEventListener('scroll', () => {
