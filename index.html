@@ -113,7 +113,7 @@
 <body>
    <div id="buttonContainer" style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; margin-bottom:10px;">
     <button onclick="prevProfile(); isLocated(false)">⬅️ Prev</button>
-    <button onclick="nextProfile(); isLocated(false)">Next ➡️</button>
+    <button onclick="nextProfile(); isLocated(false); switchContainer(container_name)">Next ➡️</button>
     <button onclick="goToFirstProfile(); isLocated(false)">🔁 First </button>
     <button onclick="preloadSheets(); isLocated(false)">🔄 Refresh</button>
   </div>
@@ -337,7 +337,7 @@
 
         showToast("Sheets refreshed!");
         displayProfile(savedIndex);
-        switchContainer(container_name); // Run Shortcut after data refresh
+        // switchContainer(container_name); // Run Shortcut after data refresh
       } catch (e) {
         showToast("Refresh failed");
       } finally {
@@ -377,7 +377,7 @@
         }
       }
 
-      switchContainer(container_name); // Run Shortcut after profile display
+      // switchContainer(container_name); // Run Shortcut after profile display
     }
 
     const container_name = document.getElementById('container').innerText.trim();
@@ -1415,10 +1415,10 @@ async function resendSMS() {
       }
 
       preloadSheets();
-      switchContainer(container_name);
+      // switchContainer(container_name);
     };
 
-    document.addEventListener('DOMContentLoaded', switchContainer(container_name));
+    // document.addEventListener('DOMContentLoaded', switchContainer(container_name));
 
     // Save scroll position on scroll
     window.addEventListener('scroll', () => {
